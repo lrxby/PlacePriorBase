@@ -76,19 +76,23 @@ provided split tool (adapted from [point2rbox-v2](https://github.com/VisionXLab/
 the script originates from OpenMMLab / BboxToolkit):
 
 ```shell
-# DOTA-v1.0
+# DOTA-v1.0 trainval
 python tools/data/dota/split/img_split.py --base-json tools/data/dota/split/split_configs/ss_trainval.json
+# DOTA-v1.0 test (images only; official test annotations are not public)
+python tools/data/dota/split/img_split.py --base-json tools/data/dota/split/split_configs/ss_test.json
 # CODrone: same 1024×1024 crop, different paths, jpg output
 python tools/data/dota/split/img_split.py --base-json tools/data/dota/split/split_configs/codrone_trainval.json
 ```
 
 DOTA-v1.5 uses exactly the same crop as DOTA-v1.0: copy `ss_trainval.json` and edit
-`img_dirs` / `ann_dirs` / `save_dir` to match your DOTA-v1.5 download.
+`img_dirs` / `ann_dirs` / `save_dir` to match your DOTA-v1.5 download (for the DOTA-v1.5 test
+split, do the same with `ss_test.json`).
 
 Edit `img_dirs` / `ann_dirs` in the json files to point to your downloaded official data, and put
 the official OBB annotations as DOTA-format txt files (8 polygon coordinates, category,
-difficulty) under `ann_dirs`. The commands above produce `data/split_ss_dota/trainval/` and
-`data/split_ss_codrone/trainval/`, each containing `images/` and `annfiles/` subfolders.
+difficulty) under `ann_dirs`. The commands above produce `data/split_ss_dota/trainval/`, `data/split_ss_dota/test/` and
+`data/split_ss_codrone/trainval/`, each containing `images/` subfolders (trainval also gets
+`annfiles/`; DOTA test annotations are not publicly available, so its `annfiles/` are empty).
 
 DroneVehicle ships at 840×712, which is below the 1024 crop size, so no cropping is needed:
 just organize it into `images/` + `annfiles/` as shown below.
@@ -96,10 +100,10 @@ just organize it into `images/` + `annfiles/` as shown below.
 Organize each dataset as follows (the pseudo-label scripts look for `images/` plus `annfiles/` automatically):
 
 ```
-DOTA-v1.0      split_ss_dota/trainval/          {images/, annfiles/}
-DOTA-v1.5      split_ss_dotav1.5/trainval/      {images/, annfiles/}
-DroneVehicle   split_ss_dronevehicle/           {trainval/{images,annfiles}, test/{images,annfiles}}
-CODrone        split_ss_codrone/trainval/       {images/, annfiles/}
+DOTA-v1.0      split_ss_dota/            {trainval/{images, annfiles}, test/{images, annfiles}}
+DOTA-v1.5      split_ss_dotav1.5/        {trainval/{images, annfiles}, test/{images, annfiles}}
+DroneVehicle   split_ss_dronevehicle/    {trainval/{images, annfiles}, test/{images, annfiles}}
+CODrone        split_ss_codrone/         {trainval/{images, annfiles}, test/{images, annfiles}}
 ```
 
 All configs use **relative paths** by default: `data_root` points to `data/<dataset>/` relative to
@@ -109,13 +113,17 @@ the repository root. The simplest setup is to put your datasets under a `data/` 
 repo_root/
 └── data/
     ├── split_ss_dota/            # DOTA-v1.0
-    │   └── trainval/  {images, annfiles}
+    │   ├── trainval/  {images, annfiles}
+    │   └── test/      {images, annfiles}   # test annotations not public
     ├── split_ss_dotav1.5/        # DOTA-v1.5
-    │   └── trainval/  {images, annfiles}
+    │   ├── trainval/  {images, annfiles}
+    │   └── test/      {images, annfiles}   # test annotations not public
     ├── split_ss_dronevehicle/    # DroneVehicle
-    │   └── {trainval/{images, annfiles}, test/{images, annfiles}}
+    │   ├── trainval/  {images, annfiles}
+    │   └── test/      {images, annfiles}
     └── split_ss_codrone/         # CODrone
-        └── trainval/  {images, annfiles}
+        ├── trainval/  {images, annfiles}
+        └── test/      {images, annfiles}
 ```
 
 Otherwise, edit `data_root` in `configs/_base_/datasets/*.py` (or the per-dataset `data_root` /
