@@ -68,6 +68,25 @@ provided in [`configs/README.md`](configs/README.md).
 
 ## Data Preparation
 
+### Cropping the raw DOTA images
+
+The raw DOTA images (up to ~20k×20k pixels) are too large to be trained on directly. Crop
+them into 1024×1024 patches with a 200-pixel overlap using the provided split tool (adapted
+from [point2rbox-v2](https://github.com/VisionXLab/point2rbox-v2); the script originates from
+OpenMMLab / BboxToolkit):
+
+```shell
+# 1. download DOTA-v1.0 and put it under data/DOTA/ (train/ and val/ folders)
+# 2. edit img_dirs / ann_dirs in the json if your paths differ
+python tools/data/dota/split/img_split.py --base-json tools/data/dota/split/split_configs/ss_trainval.json
+python tools/data/dota/split/img_split.py --base-json tools/data/dota/split/split_configs/ss_test.json
+```
+
+This produces `data/split_ss_dota/trainval/` and `data/split_ss_dota/test/`, each containing
+`images/` and `annfiles/` subfolders. For DOTA-v1.5, copy the config and adjust `img_dirs`,
+`ann_dirs` and `save_dir` accordingly. Datasets that already ship cropped patches (DroneVehicle,
+CODrone) only need to be organized into the same `images/` + `annfiles/` structure shown below.
+
 Organize each dataset as follows (the pseudo-label scripts look for `images/` plus `annfiles/` automatically):
 
 ```
