@@ -126,9 +126,7 @@ def generate_dronevehicle():
     print(f"Selected Method: {METHOD} | Config: {CFG}")
     
     img_dir = os.path.join(DATA_ROOT, 'images')
-    lbl_dir = os.path.join(DATA_ROOT, 'annfiles') 
-    if not os.path.exists(lbl_dir):
-        lbl_dir = os.path.join(DATA_ROOT, 'labelTxt')
+    lbl_dir = os.path.join(DATA_ROOT, 'annfiles')
         
     files = sorted([os.path.splitext(f)[0] for f in os.listdir(lbl_dir) if f.endswith('.txt')])
     pseudo_data_dict = {}

@@ -67,7 +67,7 @@ evaluation server:
 ```bash
 python tools/test.py configs/placepriorbase_dota1.py work_dirs/placepriorbase_dota1/epoch_12.pth \
     --cfg-options test_evaluator.format_only=True test_evaluator.merge_patches=False \
-                  test_dataloader.dataset.ann_file=test/labelTxt/ test_dataloader.dataset.data_prefix.img_path=test/images/
+                  test_dataloader.dataset.ann_file=test/annfiles/ test_dataloader.dataset.data_prefix.img_path=test/images/
 ```
 
 ## Resume from a checkpoint

@@ -11,7 +11,7 @@ Fixes three bugs of the original loader:
    untouched).
 
 2. **Row-index misalignment.**  The pseudo boxes in the pkl are generated from
-   the *full* ``labelTxt`` while the training GT may be filtered later (e.g.
+   the *full* ``annfiles`` while the training GT may be filtered later (e.g.
    ``ignore_flag`` when ``difficulty > diff_thr``).  The old code let the head
    index ``pseudo_boxes`` by the *filtered* GT row number, silently matching
    the wrong instance whenever GT and pkl counts differ (the danger is not
@@ -19,7 +19,7 @@ Fixes three bugs of the original loader:
    ignored gives GT ``[A,C]`` and ``pseudo_boxes[1]`` is ``B'``, not ``C'``).
 
    This loader re-aligns pseudo boxes to the *current* GT instances by
-   category + intra-category order (both the pkl and the labelTxt preserve the
+   category + intra-category order (both the pkl and the annfiles preserve the
    original row order, so GT is a subsequence of the pkl rows).  A GT instance
    whose category/order has no reliable match gets ``pseudo_valid=False`` and
    is excluded from ``VWRBoxLoss`` — never guessed.

@@ -68,12 +68,11 @@ provided in [`configs/README.md`](configs/README.md).
 
 ## Data Preparation
 
-Organize each dataset as follows (the pseudo-label scripts look for `images/` plus `annfiles/`
-or `labelTxt/` automatically):
+Organize each dataset as follows (the pseudo-label scripts look for `images/` plus `annfiles/` automatically):
 
 ```
-DOTA-v1.0      split_ss_dota/trainval/          {images/, labelTxt/}
-DOTA-v1.5      split_ss_dotav1.5/trainval/      {images/, labelTxt/}
+DOTA-v1.0      split_ss_dota/trainval/          {images/, annfiles/}
+DOTA-v1.5      split_ss_dotav1.5/trainval/      {images/, annfiles/}
 DroneVehicle   split_ss_dronevehicle/           {trainval/{images,annfiles}, test/{images,annfiles}}
 CODrone        split_ss_codrone/trainval/       {images/, annfiles/}
 ```
@@ -85,9 +84,9 @@ the repository root. The simplest setup is to put your datasets under a `data/` 
 repo_root/
 └── data/
     ├── split_ss_dota/            # DOTA-v1.0
-    │   └── trainval/  {images, labelTxt}
+    │   └── trainval/  {images, annfiles}
     ├── split_ss_dotav1.5/        # DOTA-v1.5
-    │   └── trainval/  {images, labelTxt}
+    │   └── trainval/  {images, annfiles}
     ├── split_ss_dronevehicle/    # DroneVehicle
     │   └── {trainval/{images, annfiles}, test/{images, annfiles}}
     └── split_ss_codrone/         # CODrone
@@ -117,26 +116,18 @@ Each generated `.pkl` is a dict `{image_id: [[cx, cy, w, h, angle, cls_id], ...]
 by the corresponding training config via `LoadPseudoAnnotations` (the `pkl_path` in each config
 already points to the generated file).
 
-Key hyper-parameters inside the scripts:
-
-| Dataset | sigma | ds | pos | neg |
-|---|---|---|---|---|
-| DOTA-v1.0 / DOTA-v1.5 | 4096 | 2 | 0.996 | 0.009 |
-| DroneVehicle | 1024 | 2 | 0.97 | 0.1 |
-| CODrone | 1024 | 2 | 0.97 | 0.005 |
-
 ## Results
 
 The baseline is trained end-to-end with **point annotations only** (one GT point per object),
 no box annotations. All models follow the released 12-epoch configs; the numbers below are the
-reproducible results on the four datasets.
+results reported in the paper.
 
-| Dataset | mAP |
+| Dataset | mAP (%) |
 |---|---|
-| DOTA-v1.0 | 0.4988 |
-| DOTA-v1.5 | 0.4195 |
-| DroneVehicle | 0.5335 |
-| CODrone | 0.2666 |
+| DOTA-v1.0 | 42.05 |
+| DOTA-v1.5 | 32.38 |
+| DroneVehicle | 40.75 |
+| CODrone | 21.70 |
 
 See the paper for per-class breakdowns and ablations.
 

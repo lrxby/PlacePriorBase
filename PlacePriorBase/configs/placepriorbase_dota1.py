@@ -188,7 +188,7 @@ test_dataloader = dict(
     dataset=dict(
         type='DOTADataset',
         data_root='data/split_ss_dota/',
-        ann_file='trainval/labelTxt/',
+        ann_file='trainval/annfiles/',
         data_prefix=dict(img_path='trainval/images/'),
         test_mode=True,
         pipeline=_base_.test_pipeline))

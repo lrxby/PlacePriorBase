@@ -145,7 +145,7 @@ def generate_pseudo_labels():
     print(f"Output: {SAVE_PATH}")
     
     img_dir = os.path.join(DATA_ROOT, 'images')
-    lbl_dir = os.path.join(DATA_ROOT, 'labelTxt')
+    lbl_dir = os.path.join(DATA_ROOT, 'annfiles')
     files = sorted([os.path.splitext(f)[0] for f in os.listdir(lbl_dir) if f.endswith('.txt')])
     
     pseudo_data_dict = {}

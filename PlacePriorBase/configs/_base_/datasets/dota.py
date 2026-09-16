@@ -42,7 +42,7 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='split_ss_dota/trainval/labelTxt/',
+        ann_file='split_ss_dota/trainval/annfiles/',
         data_prefix=dict(img_path='split_ss_dota/trainval/images/'),
         filter_cfg=dict(filter_empty_gt=True),
         pipeline=train_pipeline))
@@ -55,7 +55,7 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='split_ss_dota/trainval/labelTxt/',
+        ann_file='split_ss_dota/trainval/annfiles/',
         data_prefix=dict(img_path='split_ss_dota/trainval/images/'),
         filter_cfg=dict(filter_empty_gt=True),
         test_mode=True,
