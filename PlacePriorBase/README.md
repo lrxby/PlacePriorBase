@@ -127,7 +127,18 @@ Key hyper-parameters inside the scripts:
 
 ## Results
 
-Please refer to our paper for the detailed results on all four datasets.
+The baseline is trained end-to-end with **point annotations only** (one GT point per object),
+no box annotations. All models follow the released 12-epoch configs; the numbers below are the
+reproducible results on the four datasets.
+
+| Dataset | mAP |
+|---|---|
+| DOTA-v1.0 | 0.4988 |
+| DOTA-v1.5 | 0.4195 |
+| DroneVehicle | 0.5335 |
+| CODrone | 0.2666 |
+
+See the paper for per-class breakdowns and ablations.
 
 ## Acknowledgement
 
