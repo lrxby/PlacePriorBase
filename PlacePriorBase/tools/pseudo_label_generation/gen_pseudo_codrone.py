@@ -14,7 +14,7 @@ import torch.nn.functional as F
 # ==============================================================================
 DATA_ROOT = 'data/split_ss_codrone/trainval/'
 SAVE_PATH = 'data/split_ss_codrone/trainval/codrone-rect.pkl'
-DEVICE = 'cuda:1'
+DEVICE = 'cuda:0'
 
 # Method: Row6_Rect (minAreaRect + GT-point-center anchoring)
 METHOD = 'Row6_Rect'

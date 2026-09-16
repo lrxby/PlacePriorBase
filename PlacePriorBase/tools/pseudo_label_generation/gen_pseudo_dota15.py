@@ -14,7 +14,7 @@ import torch.nn.functional as F
 # ==============================================================================
 DATA_ROOT = 'data/split_ss_dotav1.5/trainval/'
 SAVE_PATH = 'data/split_ss_dotav1.5/dota1.5-Rect.pkl'
-DEVICE = 'cuda:1'
+DEVICE = 'cuda:0'
 
 # Method: Row6_Rect (minAreaRect + GT-point-center anchoring)
 METHOD = 'Row6_Rect'
@@ -130,10 +130,7 @@ def generate_dota15():
     print(f"Selected Method: {METHOD} | Config: {CFG}")
     
     img_dir = os.path.join(DATA_ROOT, 'images')
-    if os.path.exists(os.path.join(DATA_ROOT, 'annfiles')):
-        lbl_dir = os.path.join(DATA_ROOT, 'annfiles')
-    else:
-        lbl_dir = os.path.join(DATA_ROOT, 'annfiles')
+    lbl_dir = os.path.join(DATA_ROOT, 'annfiles')
         
     files = sorted([os.path.splitext(f)[0] for f in os.listdir(lbl_dir) if f.endswith('.txt')])
     pseudo_data_dict = {}

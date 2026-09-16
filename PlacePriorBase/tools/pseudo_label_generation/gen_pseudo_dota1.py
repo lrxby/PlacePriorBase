@@ -15,7 +15,7 @@ import torch.nn.functional as F
 # ==============================================================================
 DATA_ROOT = 'data/split_ss_dota/trainval/'
 SAVE_PATH = 'data/split_ss_dota/trainval/dota1-rect.pkl'
-DEVICE = 'cuda:1'
+DEVICE = 'cuda:0'
 
 # Method: Row6_Rect (minAreaRect + GT-point-center anchoring)
 
