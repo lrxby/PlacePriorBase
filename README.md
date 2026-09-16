@@ -68,24 +68,30 @@ provided in [`configs/README.md`](configs/README.md).
 
 ## Data Preparation
 
-### Cropping the raw DOTA images
+### Cropping the raw DOTA / CODrone images
 
-The raw DOTA images (up to ~20k×20k pixels) are too large to be trained on directly. Crop
-them into 1024×1024 patches with a 200-pixel overlap using the provided split tool (adapted
-from [point2rbox-v2](https://github.com/VisionXLab/point2rbox-v2); the script originates from
-OpenMMLab / BboxToolkit):
+The raw DOTA images (up to ~20k×20k pixels) and CODrone images (3840×2160) are too large
+to be trained on directly. Crop them into 1024×1024 patches using the provided split tool
+(adapted from [point2rbox-v2](https://github.com/VisionXLab/point2rbox-v2); the script originates
+from OpenMMLab / BboxToolkit):
 
 ```shell
-# 1. download DOTA-v1.0 and put it under data/DOTA/ (train/ and val/ folders)
-# 2. edit img_dirs / ann_dirs in the json if your paths differ
+# DOTA-v1.0: 1024×1024 patches, 200-px overlap
 python tools/data/dota/split/img_split.py --base-json tools/data/dota/split/split_configs/ss_trainval.json
-python tools/data/dota/split/img_split.py --base-json tools/data/dota/split/split_configs/ss_test.json
+# DOTA-v1.5: same crop size, different paths
+python tools/data/dota/split/img_split.py --base-json tools/data/dota/split/split_configs/dotav15_trainval.json
+# CODrone: 3840×2160 -> 1024×1024 patches, 120-px overlap (matches the reported results)
+python tools/data/dota/split/img_split.py --base-json tools/data/dota/split/split_configs/codrone_trainval.json
 ```
 
-This produces `data/split_ss_dota/trainval/` and `data/split_ss_dota/test/`, each containing
-`images/` and `annfiles/` subfolders. For DOTA-v1.5, copy the config and adjust `img_dirs`,
-`ann_dirs` and `save_dir` accordingly. Datasets that already ship cropped patches (DroneVehicle,
-CODrone) only need to be organized into the same `images/` + `annfiles/` structure shown below.
+Edit `img_dirs` / `ann_dirs` in the json files to point to your downloaded official data, and put
+the official OBB annotations as DOTA-format txt files (8 polygon coordinates, category,
+difficulty) under `ann_dirs`. The commands above produce `data/split_ss_dota/trainval/`,
+`data/split_ss_dotav1.5/trainval/` and `data/split_ss_codrone/trainval/`, each containing
+`images/` and `annfiles/` subfolders.
+
+DroneVehicle ships at 840×712, which is below the 1024 crop size, so no cropping is needed:
+just organize it into `images/` + `annfiles/` as shown below.
 
 Organize each dataset as follows (the pseudo-label scripts look for `images/` plus `annfiles/` automatically):
 
