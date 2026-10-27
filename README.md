@@ -15,6 +15,13 @@
 detection**: given only one point (the GT center) per object, the detector learns to predict
 oriented bounding boxes (OBBs) end-to-end, without any box annotations during training.
 
+## Repository Structure
+
+| Folder | Model | Description |
+|---|---|---|
+| [`PlacePriorBase/`](PlacePriorBase) | PlacePriorBase | The baseline: point-supervised oriented detection with placement prior. |
+| [`PlacePrior+P2R2/`](PlacePrior+P2R2) | PlacePrior + Point2RBox-v2 | The same three place-prior losses on top of Point2RBox-v2. |
+
 ## Introduction
 
 We rethink point-supervised oriented object detection from the perspective of a **placement
