@@ -4,21 +4,19 @@ from typing import Dict, List, Optional, Tuple
 
 import torch
 import torch.nn as nn
-from mmcv.cnn import Scale, ConvModule
 from mmdet.models.dense_heads import AnchorFreeHead
 from mmdet.models.utils import (filter_scores_and_topk, multi_apply,
                                 select_single_mlvl, unpack_gt_instances)
 from mmdet.structures import SampleList
 from mmdet.structures.bbox import cat_boxes
-from mmdet.utils import (ConfigType, InstanceList, OptConfigType,
+from mmdet.utils import (ConfigType, InstanceList, 
                          OptInstanceList, reduce_mean)
 from mmengine import ConfigDict
 from mmengine.structures import InstanceData
 from torch import Tensor
 
 from mmrotate.registry import MODELS, TASK_UTILS
-from mmrotate.structures import RotatedBoxes, rbox2qbox, hbox2rbox, rbox2hbox
-from mmrotate.models.losses.gaussian_dist_loss import xy_wh_r_2_xy_sigma, gwd_loss
+from mmrotate.structures import RotatedBoxes
 
 INF = 1e8
 

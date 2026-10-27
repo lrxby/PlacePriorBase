@@ -1,5 +1,6 @@
 matplotlib
 numpy
+opencv-python
 pycocotools
 six
 terminaltables
