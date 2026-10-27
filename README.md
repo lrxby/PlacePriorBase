@@ -11,6 +11,11 @@
   </p>
 </p>
 
+This repository contains two variants of the same idea:
+**PlacePriorBase**, a simple yet effective baseline for **point-supervised oriented object
+detection**, and **PlacePrior+P2R2**, which integrates the three place-prior losses into
+Point2RBox-v2. Both are trained end-to-end from point annotations only.
+
 **PlacePriorBase** is a simple yet effective baseline for **point-supervised oriented object
 detection**: given only one point (the GT center) per object, the detector learns to predict
 oriented bounding boxes (OBBs) end-to-end, without any box annotations during training.
@@ -158,18 +163,18 @@ already points to the generated file).
 
 ## Results
 
-The baseline is trained end-to-end with **point annotations only** (one GT point per object),
-no box annotations. All models follow the released 12-epoch configs; the numbers below are the
-results reported in the paper.
+| Model | DroneVehicle | CODrone | DOTA-v1.0 | DOTA-v1.5 |
+|---|---|---|---|---|
+| PlacePriorBase | 40.75 | 21.70 | 42.05 | 32.38 |
+| PlacePrior+P2R2 | 56.37 | 24.11 | 52.63 | 43.06 |
 
-| Dataset | mAP (%) |
-|---|---|
-| DOTA-v1.0 | 42.05 |
-| DOTA-v1.5 | 32.38 |
-| DroneVehicle | 40.75 |
-| CODrone | 21.70 |
+All models are trained end-to-end with **point annotations only** (one GT point per object) and
+tested end-to-end. Numbers are reported in the paper; per-class breakdowns and ablations are given
+there. Released configs and commands for each variant live in the corresponding sub-folder:
 
-See the paper for per-class breakdowns and ablations.
+- `PlacePriorBase/` -- the baseline (this README)
+- `PlacePrior+P2R2/` -- the same losses on top of Point2RBox-v2, see
+  [`PlacePrior+P2R2/README.md`](PlacePrior+P2R2/README.md)
 
 ## Acknowledgement
 

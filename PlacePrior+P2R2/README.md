@@ -11,114 +11,75 @@
   </p>
 </p>
 
-This folder contains the **PlacePrior + P2R2** model: it keeps the point-supervised pipeline of
-[point2rbox-v2](https://github.com/VisionXLab/point2rbox-v2) and adds the three place-prior
-losses introduced in PlacePriorBase:
+This folder contains **PlacePrior + P2R2**: the point-supervised pipeline of
+[point2rbox-v2](https://github.com/VisionXLab/point2rbox-v2) with the three place-prior losses of
+PlacePriorBase added on top.
 
-- **Angle prior loss** -- predicts the object angle from the point center via a polar coder.
-- **Size prior loss** -- regresses object width/height in L2 (MSE) form.
-- **Voronoi Watershed RBox loss** -- supervises the predicted box with the placement prior
-  derived from the watershed map.
+| Loss | Role |
+|---|---|
+| `AnglePriorLoss` | predicts the object angle from the point center via a polar coder |
+| `SizePriorLoss` | regresses object width/height in L2 (MSE) form |
+| `VWRBoxLoss` | supervises the predicted box with the placement prior from the watershed map |
 
-The three losses consume the pseudo boxes produced by the watershed pipeline, so training reads a
-pseudo-label `.pkl` through `LoadPseudoAnnotations`, and `PseudoBoxSync` keeps those boxes
-consistent with the resize/flip augmentation. Pseudo-label generation is shared with
-`../PlacePriorBase` and is **not** duplicated here.
+The three losses consume watershed pseudo boxes, so training reads a pseudo-label `.pkl` through
+`LoadPseudoAnnotations`, and `PseudoBoxSync` keeps those boxes consistent with resize/flip.
 
-## Installation
+Environment setup, data preparation and pseudo-label generation are shared with the baseline and
+are described in the [repository README](../README.md).
 
-Same environment as `../PlacePriorBase`. The bundled `mmrotate` is self-contained (no separate
-`pip install mmrotate` needed).
-
-```bash
-# 1. create environment
-conda create -n placepriorp2r2 python=3.9 -y
-conda activate placepriorp2r2
-
-# 2. install PyTorch (match your CUDA)
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-
-# 3. install mm dependencies (see requirements/mminstall.txt)
-pip install -U openmim
-mim install mmcv==2.1.0
-pip install mmdet==3.3.0 mmengine==0.10.7
-
-# 4. install this repo
-pip install -r requirements/runtime.txt
-pip install -e .
-```
-
-## Getting Started
-
-Training and testing commands are provided in [`configs/README.md`](configs/README.md).
-All configs use relative paths and expect the datasets under `data/`.
-
-## Data Preparation
-
-Identical to `../PlacePriorBase` (1024x1024 crops, 200-px overlap; DroneVehicle ships at
-840x712 and needs no cropping). Organize each dataset as:
-
-```
-data/
-├── split_ss_dota/            # DOTA-v1.0
-│   ├── trainval/  {images, annfiles}
-│   └── test/      {images, annfiles}   # test annotations not public
-```
-
-## Pseudo-Label Generation
-
-Use the scripts shipped in `../PlacePriorBase/tools/pseudo_label_generation/`. Each generated
-`.pkl` is a dict `{image_id: [[cx, cy, w, h, angle, cls_id], ...]}`; the training config loads it
-via `LoadPseudoAnnotations`. The released DOTA-v1.0 config expects
-
-```
-data/split_ss_dota/trainval/dota1-rect.pkl
-```
-
-## Training
+## Training and Testing
 
 ```bash
 # single GPU
 python tools/train.py configs/placepriorp2r2_dota1.py
 
-# multiple GPUs (8 cards)
+# multiple GPUs
 bash tools/dist_train.sh configs/placepriorp2r2_dota1.py 8
+
+# evaluation on the trainval split
+python tools/test.py configs/placepriorp2r2_dota1.py \
+    work_dirs/placepriorp2r2_dota1/epoch_12.pth
+
+# submission package for the DOTA server
+python tools/test.py configs/placepriorp2r2_dota1.py \
+    work_dirs/placepriorp2r2_dota1/epoch_12.pth \
+    --cfg-options test_evaluator=test_evaluator_submission
 ```
 
-The config uses 12 epochs, AdamW with lr 5e-5, LinearLR(500 iters) followed by
-MultiStepLR at epochs 8 and 11, and evaluates mAP on the trainval split every epoch.
+## Released Config
+
+| Config | Dataset | Classes | Epochs |
+|---|---|---|---|
+| `configs/placepriorp2r2_dota1.py` | DOTA-v1.0 | 15 | 12 |
+
+Key settings: `ss_prob=[0.35, 0.05, 0.6]`, `copy_paste_start_epoch=6`, milestones `[8, 11]`,
+AdamW with lr `5e-5`, LinearLR warm-up over the first 500 iterations, and effective place-prior
+weights of `0.2 / 0.1 / 0.5` for angle / size / ourwater.
+
+Configs for DOTA-v1.5, DroneVehicle and CODrone will be added once their runs are finalized.
+
+## Loss Switches
+
+The three place-prior losses are controlled by `use_size_loss`, `use_angle_loss` and
+`use_ourwater_loss` in `bbox_head`; their effective weight is `loss_weight * scale_factor`.
+
+All three default to `False`, so the head behaves exactly like the original Point2RBox-v2 head
+unless a config turns them on. The released DOTA-v1.0 config turns all three on.
 
 ## Results
 
-All models are trained end-to-end with **point annotations only**; no box annotations are used.
-
 | Dataset | Backbone | mAP (%) |
 |---|---|---|
-| DOTA-v1.0 | ResNet-50 | **52.86** |
+| DOTA-v1.0 | ResNet-50 | 52.63 |
 
-Notes:
-
-- 52.86 is the best run of the released `placepriorp2r2_dota1.py` config; an independent repeat
-  gives 52.13, so expect roughly +/- 0.4 mAP run-to-run.
-- The paper reports 52.63 for this setting.
-- Configs for DOTA-v1.5, DroneVehicle and CODrone will be added once their runs are finalized.
+Numbers are reported in the paper (end-to-end training and testing with point annotations only).
+Per-class breakdowns and ablation results are given in the paper.
 
 ## Acknowledgement
 
 This codebase builds on MMRotate, MMDetection, MMEngine and
 [point2rbox-v2](https://github.com/VisionXLab/point2rbox-v2). We thank the authors for their
 excellent open-source projects.
-
-## Citation
-
-```bibtex
-@inproceedings{placepriorbase2026,
-  title={A Simple Baseline with Placement Prior for Point-Supervised Oriented Object Detection},
-  author={Runxiang Liu, Kaikai Xie, Qianxi Cao, Yuming Fang, Jiebin Yan, and Junjie Chen},
-  booktitle={Proceedings of the European Conference on Computer Vision (ECCV)},
-  year={2026}
-}
-```
 
 ## License
 

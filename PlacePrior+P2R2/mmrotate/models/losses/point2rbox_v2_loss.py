@@ -177,33 +177,6 @@ class GaussianOverlapLoss(nn.Module):
             avg_factor=avg_factor))
 
 
-def plot_gaussian_voronoi_watershed(*images):
-    """Plot figures for debug."""
-    import matplotlib.pyplot as plt
-    plt.figure(dpi=300, figsize=(len(images) * 4, 4))
-    plt.tight_layout()
-    fileid = np.random.randint(0, 20)
-    for i in range(len(images)):
-        img = images[i]
-        img = (img - img.min()) / (img.max() - img.min())
-        if img.dim() == 3:
-            img = img.permute(1, 2, 0)
-        img = img.detach().cpu().numpy()
-        plt.subplot(1, len(images), i + 1)
-        if i == 3:
-            plt.imshow(img)
-            x = np.linspace(0, 1024, 1024)
-            y = np.linspace(0, 1024, 1024)
-            X, Y = np.meshgrid(x, y)
-            plt.contourf(X, Y, img, levels=8, cmap=plt.get_cmap('magma'))
-        else:
-            plt.imshow(img)
-        plt.xticks([])
-        plt.yticks([])
-    plt.savefig(f'debug/Gaussian-Voronoi-{fileid}.png')
-    plt.close()
-
-
 def gaussian_2d(xy, mu, sigma, normalize=False):
     dxy = (xy - mu).unsqueeze(-1)
     t0 = torch.exp(-0.5 * dxy.permute(0, 2, 1).bmm(torch.linalg.solve(sigma, dxy)))
@@ -219,7 +192,7 @@ def gaussian_voronoi_watershed_loss(mu, sigma,
                                     default_sigma=4096,
                                     voronoi='gaussian-orientation',
                                     alpha=0.1,
-                                    debug=False):
+):
     J = len(sigma)
     if J == 0:
         return sigma.sum()
@@ -277,9 +250,6 @@ def gaussian_voronoi_watershed_loss(mu, sigma,
     markers = vor.detach().cpu().numpy().astype(np.int32)
     markers = vor.new_tensor(cv2.watershed(img_uint8, markers))
 
-    if debug:
-        plot_gaussian_voronoi_watershed(image, cls_bg, markers)
-
     L, V = torch.linalg.eigh(sigma)
     L_target = []
     for j in range(J):
@@ -319,15 +289,13 @@ class VoronoiWatershedLoss(nn.Module):
                  reduction='mean',
                  loss_weight=1.0,
                  topk=0.95,
-                 alpha=0.1,
-                 debug=False):
+                 alpha=0.1):
         super(VoronoiWatershedLoss, self).__init__()
         self.down_sample = down_sample
         self.reduction = reduction
         self.loss_weight = loss_weight
         self.topk = topk
         self.alpha = alpha
-        self.debug = debug
 
     def forward(self, pred, label, image, pos_thres, neg_thres, voronoi='orientation'):
         """Forward function.
@@ -352,8 +320,7 @@ class VoronoiWatershedLoss(nn.Module):
                                                self.down_sample, 
                                                topk=self.topk,
                                                voronoi=voronoi,
-                                               alpha=self.alpha,
-                                               debug=self.debug)
+                                               alpha=self.alpha)
         return self.loss_weight * loss
 
 
@@ -379,33 +346,6 @@ def rbbox2roi(bbox_list):
     return rois
 
 
-def plot_edge_map(feat, edgex, edgey):
-    """Plot figures for debug."""
-    import matplotlib.pyplot as plt
-    plt.figure(dpi=300, figsize=(4, 4))
-    plt.tight_layout()
-    fileid = np.random.randint(0, 20)
-    for i in range(len(feat)):
-        img0 = feat[i, :3]
-        img0 = (img0 - img0.min()) / (img0.max() - img0.min())
-        img1 = edgex[i, :3]
-        img1 = (img1 - img1.min()) / (img1.max() - img1.min())
-        img2 = edgey[i, :3]
-        img2 = (img2 - img2.min()) / (img2.max() - img2.min())
-        img3 = img1 + img2
-        img3 = (img3 - img3.min()) / (img3.max() - img3.min())
-        img = torch.cat((torch.cat((img0, img2), -1), 
-                         torch.cat((img1, img3), -1)), -2
-                         ).permute(1, 2, 0).detach().cpu().numpy()
-        N = int(np.ceil(np.sqrt(len(feat))))
-        plt.subplot(N, N, i + 1)
-        plt.imshow(img)
-        plt.xticks([])
-        plt.yticks([])
-    plt.savefig(f'debug/Edge-Map-{fileid}.png')
-    plt.close()
-
-
 @MODELS.register_module()
 class EdgeLoss(nn.Module):
     """Edge Loss.
@@ -425,8 +365,7 @@ class EdgeLoss(nn.Module):
                  max_scale=1.6,
                  sigma=6,
                  reduction='mean',
-                 loss_weight=1.0,
-                 debug=False):
+                 loss_weight=1.0):
         super(EdgeLoss, self).__init__()
         self.resolution = resolution
         self.max_scale = max_scale
@@ -434,7 +373,6 @@ class EdgeLoss(nn.Module):
         self.reduction = reduction
         self.loss_weight = loss_weight
         self.center_idx = self.resolution / self.max_scale
-        self.debug = debug
 
         self.roi_extractor = MODELS.build(dict(
             type='RotatedSingleRoIExtractor',
@@ -479,11 +417,6 @@ class EdgeLoss(nn.Module):
         exy = torch.stack((ex, ey), -1)
         rbbox_concat = torch.cat(pred, 0)
         
-        if self.debug:
-            edgex = featx[:, None, None, :].expand(-1, 1, 2 * self.resolution + 1, -1)
-            edgey = featy[:, None, :, None].expand(-1, 1, -1, 2 * self.resolution + 1)
-            plot_edge_map(feat, edgex, edgey)
-
         return self.loss_weight * F.smooth_l1_loss(rbbox_concat[:, 2:4], 
                                       (rbbox_concat[:, 2:4] * exy).detach(),
                                       beta=8)
