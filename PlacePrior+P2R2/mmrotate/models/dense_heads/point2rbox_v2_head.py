@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import os, copy, math
+import copy
 from typing import Dict, List, Optional, Tuple
 
 import torch
