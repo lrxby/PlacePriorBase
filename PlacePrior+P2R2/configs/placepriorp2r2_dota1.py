@@ -169,49 +169,27 @@ train_pipeline = [
     )
 ]
 
-test_pipeline = [
+val_pipeline = [
     dict(type='mmdet.LoadImageFromFile', backend_args={{_base_.backend_args}}),
+    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
+    # avoid bboxes being resized
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
-    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     dict(
         type='mmdet.PackDetInputs',
         meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
                    'scale_factor'))
 ]
 
-data_root = 'data/split_ss_dota/'
+data_root = 'data/'
 
 train_dataloader = dict(
     batch_size=2,
-    dataset=dict(
-        type='DOTADataset',
-        data_root=data_root,
-        ann_file='trainval/annfiles/',
-        data_prefix=dict(img_path='trainval/images/'),
-        filter_cfg=dict(filter_empty_gt=True),
-        pipeline=train_pipeline))
+    dataset=dict(pipeline=train_pipeline))
 
 val_dataloader = dict(
     batch_size=16,
-    dataset=dict(
-        type='DOTADataset',
-        data_root=data_root,
-        ann_file='trainval/annfiles/',
-        data_prefix=dict(img_path='trainval/images/'),
-        filter_cfg=dict(filter_empty_gt=True),
-        test_mode=True,
-        pipeline=test_pipeline))
-
-test_dataloader = dict(
-    batch_size=4,
-    dataset=dict(
-        type='DOTADataset',
-        data_root=data_root,
-        ann_file='test/labelTxt/',
-        data_prefix=dict(img_path='test/images/'),
-        test_mode=True,
-        pipeline=test_pipeline))
+    dataset=dict(pipeline=val_pipeline))
 
 # optimizer: AdamW 5e-5
 optim_wrapper = dict(
@@ -243,17 +221,13 @@ custom_hooks = [dict(type='mmdet.SetEpochInfoHook')]
 
 train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=12, val_interval=1)
 
-# val: mAP on trainval
+# val: mAP on the trainval split
 val_evaluator = dict(type='DOTAMetric', metric='mAP')
 
-# Note: explicitly disable format_only / merge_patches; otherwise the base
-# test_evaluator (format_only=True, merge_patches=True) survives config merge
-# and evaluation only produces a submission.
-test_evaluator = dict(type='DOTAMetric', metric='mAP',
-                      format_only=False, merge_patches=False)
-
-test_evaluator_submission = dict(
+# test_evaluator inherits the submission setup of the base config
+# (format_only=True, merge_patches=True); only the output prefix is overridden.
+test_evaluator = dict(
     type='DOTAMetric',
     format_only=True,
     merge_patches=True,
-    outfile_prefix='./work_dirs/p2r2_dota1/Task1')
+    outfile_prefix='./work_dirs/placepriorp2r2_dota1/Task1')

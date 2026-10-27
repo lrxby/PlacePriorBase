@@ -30,32 +30,31 @@ are described in the [repository README](../README.md).
 ## Training and Testing
 
 ```bash
-# single GPU
+# training, single GPU
 python tools/train.py configs/placepriorp2r2_dota1.py
 
-# multiple GPUs
+# training, multiple GPUs
 bash tools/dist_train.sh configs/placepriorp2r2_dota1.py 8
 
-# evaluation on the trainval split
-python tools/test.py configs/placepriorp2r2_dota1.py \
+# mAP on the trainval split
+python tools/test.py configs/placepriorp2r2_dota1_val.py \
     work_dirs/placepriorp2r2_dota1/epoch_12.pth
 
-# submission package for the DOTA server
+# submission package for the DOTA server (writes ./work_dirs/placepriorp2r2_dota1/Task1)
 python tools/test.py configs/placepriorp2r2_dota1.py \
-    work_dirs/placepriorp2r2_dota1/epoch_12.pth \
-    --cfg-options test_evaluator=test_evaluator_submission
+    work_dirs/placepriorp2r2_dota1/epoch_12.pth
 ```
 
-## Released Config
+## Released Configs
 
-| Config | Dataset | Classes | Epochs |
-|---|---|---|---|
-| `configs/placepriorp2r2_dota1.py` | DOTA-v1.0 | 15 | 12 |
+| Config | Purpose | Dataset | Classes | Epochs |
+|---|---|---|---|---|
+| `configs/placepriorp2r2_dota1.py` | training + submission package | DOTA-v1.0 | 15 | 12 |
+| `configs/placepriorp2r2_dota1_val.py` | mAP on the trainval split | DOTA-v1.0 | 15 | - |
 
-Key settings: `ss_prob=[0.35, 0.05, 0.6]`, `copy_paste_start_epoch=6`, milestones `[8, 11]`,
-AdamW with lr `5e-5`, LinearLR warm-up over the first 500 iterations, and effective place-prior
-weights of `0.2 / 0.1 / 0.5` for angle / size / ourwater.
-
+Key settings of the training config: `ss_prob=[0.35, 0.05, 0.6]`, `copy_paste_start_epoch=6`,
+milestones `[8, 11]`, AdamW with lr `5e-5`, LinearLR warm-up over the first 500 iterations, and
+effective place-prior weights of `0.2 / 0.1 / 0.5` for angle / size / ourwater.
 
 ## Loss Switches
 
