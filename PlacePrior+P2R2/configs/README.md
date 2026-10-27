@@ -9,7 +9,6 @@ main README for the directory layout.
 |---|---|---|---|
 | [`placepriorp2r2_dota1.py`](placepriorp2r2_dota1.py) | DOTA-v1.0 (15 classes) | PlacePrior + Point2RBox-v2 | 12 |
 
-Configs for DOTA-v1.5, DroneVehicle and CODrone will be added once their runs are finalized.
 
 ## Commands
 

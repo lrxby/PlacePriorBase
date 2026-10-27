@@ -56,7 +56,6 @@ Key settings: `ss_prob=[0.35, 0.05, 0.6]`, `copy_paste_start_epoch=6`, milestone
 AdamW with lr `5e-5`, LinearLR warm-up over the first 500 iterations, and effective place-prior
 weights of `0.2 / 0.1 / 0.5` for angle / size / ourwater.
 
-Configs for DOTA-v1.5, DroneVehicle and CODrone will be added once their runs are finalized.
 
 ## Loss Switches
 
