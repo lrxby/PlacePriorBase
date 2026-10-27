@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pth
+!third_parties/ted/ted.pth
 *.log
 
 work_dirs/

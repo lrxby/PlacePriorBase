@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 from typing import Tuple, Union, List, Optional
 
+import os
+
 import torch
 from torch import Tensor
 import torch.nn.functional as F
@@ -135,11 +137,17 @@ class Point2RBoxV2(SingleStageDetector):
         self.copy_paste_start_epoch = copy_paste_start_epoch
         self.num_copies = num_copies
         self.copy_paste_cache = None
+        self.epoch = 0
 
         self.ted_model = TED()
         for param in self.ted_model.parameters():
             param.requires_grad = False
-        self.ted_model.load_state_dict(torch.load('third_parties/ted/ted.pth'))
+        self.ted_model.load_state_dict(
+            torch.load(
+                os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.dirname(
+                        os.path.dirname(os.path.abspath(__file__))))),
+                    'third_parties/ted/ted.pth'), map_location='cpu'))
         self.ted_model.eval()
 
     def set_epoch(self, epoch):
