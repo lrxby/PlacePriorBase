@@ -27,6 +27,10 @@ The three losses consume watershed pseudo boxes, so training reads a pseudo-labe
 Environment setup, data preparation and pseudo-label generation are shared with the baseline and
 are described in the [repository README](../README.md).
 
+> Note: if another `mmrotate` is already installed in the environment, remove it first
+> (`pip uninstall -y mmrotate`) before `pip install -e .`; otherwise `tools/*.py` will import
+> that copy instead of the bundled one.
+
 ## Training and Testing
 
 ```bash
