@@ -25,35 +25,53 @@ INF = 1e8
 
 @MODELS.register_module()
 class Point2RBoxV2Head(AnchorFreeHead):
-    """Anchor-free head used in `FCOS <https://arxiv.org/abs/1904.01355>`_.
+    """Anchor-free head used by Point2RBox-v2.
 
-    Compared with FCOS head, Rotated FCOS head add a angle branch to
-    support rotated object detection.
+    Point-supervised oriented detection head. On top of the Point2RBox-v2
+    losses it can optionally apply three place-prior losses
+    (``AnglePriorLoss``, ``SizePriorLoss`` and ``VWRBoxLoss``), controlled by
+    ``use_angle_loss`` / ``use_size_loss`` / ``use_ourwater_loss``.
 
     Args:
-        num_classes (int): Number of categories excluding the background
-            category.
+        num_classes (int): Number of categories excluding the background.
         in_channels (int): Number of channels in the input feature map.
-        angle_version (str): Angle representations. Defaults to 'le90'.
-        use_hbbox_loss (bool): If true, use horizontal bbox loss and
-            loss_angle should not be None. Default to False.
-        scale_angle (bool): If true, add scale to angle pred branch.
-            Default to True.
-        angle_coder (:obj:`ConfigDict` or dict): Config of angle coder.
-        h_bbox_coder (dict): Config of horzional bbox coder,
-            only used when use_hbbox_loss is True.
-        bbox_coder (:obj:`ConfigDict` or dict): Config of bbox coder. Defaults
-            to 'DistanceAnglePointCoder'.
+        strides (list): Feature strides. Defaults to [8].
+        regress_ranges (list): Regression range of each level.
+        center_sampling (bool): Whether to use center sampling.
+        center_sample_radius (float): Radius of center sampling.
+        angle_version (str): Angle representation. Defaults to 'le90'.
+        edge_loss_start_epoch (int): Epoch at which the edge loss starts.
+        joint_angle_start_epoch (int): Epoch at which joint angle training starts.
+        pseudo_generator (bool): Whether to run in pseudo-label generation mode.
+        voronoi_type (str): Voronoi type used by the watershed loss.
+        voronoi_thres (dict): Positive/negative thresholds per class.
+        square_cls (list): Classes constrained to be square.
+        edge_loss_cls (list): Classes that use the edge loss.
+        post_process (dict): Per-class post-processing factors.
+        angle_coder (:obj:`ConfigDict` or dict): Config of the angle coder.
         loss_cls (:obj:`ConfigDict` or dict): Config of classification loss.
-        loss_bbox (:obj:`ConfigDict` or dict): Config of localization loss.
-        loss_centerness (:obj:`ConfigDict`, or dict): Config of centerness loss.
-        loss_angle (:obj:`ConfigDict` or dict, Optional): Config of angle loss.
-
-    Example:
-        >>> self = RotatedFCOSHead(11, 7)
-        >>> feats = [torch.rand(1, 7, s, s) for s in [4, 8, 16, 32, 64]]
-        >>> cls_score, bbox_pred, angle_pred, centerness = self.forward(feats)
-        >>> assert len(cls_score) == len(self.scales)
+        loss_bbox (:obj:`ConfigDict` or dict): Config of box regression loss.
+        loss_overlap (:obj:`ConfigDict` or dict): Config of overlap loss.
+        loss_voronoi (:obj:`ConfigDict` or dict): Config of watershed loss.
+        loss_bbox_edg (:obj:`ConfigDict` or dict): Config of edge loss.
+        loss_ss (:obj:`ConfigDict` or dict): Config of consistency loss.
+        loss_angle (:obj:`ConfigDict` or dict, optional): Angle prior loss.
+        loss_size (:obj:`ConfigDict` or dict, optional): Size prior loss.
+        loss_ourwater (:obj:`ConfigDict` or dict, optional): Watershed box
+            prior loss.
+        use_bbox_loss (bool): Enable the box regression loss.
+        use_overlap_loss (bool): Enable the overlap loss.
+        use_voronoi_loss (bool): Enable the watershed loss.
+        use_edg_loss (bool): Enable the edge loss.
+        use_ss_loss (bool): Enable the consistency loss.
+        use_angle_loss (bool): Enable the angle prior loss. Defaults to False.
+        use_size_loss (bool): Enable the size prior loss. Defaults to False.
+        use_ourwater_loss (bool): Enable the watershed box prior loss.
+            Defaults to False.
+        mask_synth_priors (bool): If True, the size and angle priors ignore
+            copy-paste synthetic objects. Defaults to False.
+        norm_cfg (:obj:`ConfigDict` or dict): Config of normalization layer.
+        init_cfg (:obj:`ConfigDict` or dict, optional): Initialization config.
     """  # noqa: E501
 
     def __init__(self,
