@@ -55,10 +55,16 @@ python tools/test.py configs/placepriorp2r2_dota1.py \
 |---|---|---|---|---|
 | `configs/placepriorp2r2_dota1.py` | training + submission package | DOTA-v1.0 | 15 | 12 |
 | `configs/placepriorp2r2_dota1_val.py` | mAP on the trainval split | DOTA-v1.0 | 15 | - |
+| `configs/placepriorp2r2_dota15.py` | training + submission package | DOTA-v1.5 | 16 | 12 |
+| `configs/placepriorp2r2_dota15_val.py` | mAP on the trainval split | DOTA-v1.5 | 16 | - |
 
 Key settings of the training config: `ss_prob=[0.35, 0.05, 0.6]`, `copy_paste_start_epoch=6`,
 milestones `[8, 11]`, AdamW with lr `5e-5`, LinearLR warm-up over the first 500 iterations, and
 effective place-prior weights of `0.2 / 0.1 / 0.5` for angle / size / ourwater.
+
+The DOTA-v1.5 configs use exactly the same hyper-parameters; only the dataset-specific parts
+differ: `num_classes` (16 vs 15), the extra class index `15` in the two `target_classes` lists,
+the `DOTAv15Dataset` base and the pseudo-label file name.
 
 ## Loss Switches
 
@@ -73,6 +79,7 @@ unless a config turns them on. The released DOTA-v1.0 config turns all three on.
 | Dataset | Backbone | mAP (%) |
 |---|---|---|
 | DOTA-v1.0 | ResNet-50 | 52.63 |
+| DOTA-v1.5 | ResNet-50 | 43.06 |
 
 Numbers are reported in the paper (end-to-end training and testing with point annotations only).
 Per-class breakdowns and ablation results are given in the paper.

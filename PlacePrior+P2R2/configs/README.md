@@ -9,6 +9,8 @@ main README for the directory layout.
 |---|---|---|---|---|
 | [`placepriorp2r2_dota1.py`](placepriorp2r2_dota1.py) | training + submission package | DOTA-v1.0 (15 classes) | PlacePrior + Point2RBox-v2 | 12 |
 | [`placepriorp2r2_dota1_val.py`](placepriorp2r2_dota1_val.py) | mAP on the trainval split | DOTA-v1.0 | same weights | - |
+| [`placepriorp2r2_dota15.py`](placepriorp2r2_dota15.py) | training + submission package | DOTA-v1.5 (16 classes) | PlacePrior + Point2RBox-v2 | 12 |
+| [`placepriorp2r2_dota15_val.py`](placepriorp2r2_dota15_val.py) | mAP on the trainval split | DOTA-v1.5 | same weights | - |
 
 ## Commands
 
@@ -26,6 +28,9 @@ python tools/test.py configs/placepriorp2r2_dota1_val.py \
 # submission package for the DOTA server (writes ./work_dirs/placepriorp2r2_dota1/Task1)
 python tools/test.py configs/placepriorp2r2_dota1.py \
     work_dirs/placepriorp2r2_dota1/epoch_12.pth
+
+# same for DOTA-v1.5 (`_val` variant for mAP, plain config for the submission package)
+python tools/train.py configs/placepriorp2r2_dota15.py
 ```
 
 ## Notes
