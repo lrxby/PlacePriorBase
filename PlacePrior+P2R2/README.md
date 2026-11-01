@@ -78,6 +78,8 @@ unless a config turns them on. Both released DOTA configs (v1.0 and v1.5) turn a
 
 | Dataset | Backbone | mAP (%) |
 |---|---|---|
+| DroneVehicle | ResNet-50 | 56.37 |
+| CODrone | ResNet-50 | 24.11 |
 | DOTA-v1.0 | ResNet-50 | 52.63 |
 | DOTA-v1.5 | ResNet-50 | 43.06 |
 
