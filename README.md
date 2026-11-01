@@ -16,9 +16,8 @@ This repository contains two variants of the same idea:
 detection**, and **PlacePrior+P2R2**, which integrates the three place-prior losses into
 Point2RBox-v2. Both are trained end-to-end from point annotations only.
 
-**PlacePriorBase** is a simple yet effective baseline for **point-supervised oriented object
-detection**: given only one point (the GT center) per object, the detector learns to predict
-oriented bounding boxes (OBBs) end-to-end, without any box annotations during training.
+Given only one point (the GT center) per object, **PlacePriorBase** learns to predict oriented
+bounding boxes (OBBs) end-to-end, without any box annotations during training.
 
 ## Repository Structure
 
@@ -69,14 +68,21 @@ pip install -r requirements/runtime.txt
 pip install -e .
 ```
 
-The bundled `mmrotate` is self-contained (no separate `pip install mmrotate` needed). The only
-modification vs. upstream is a small fix in `mmrotate/evaluation/functional/mean_ap.py` for
-evaluating images without ground-truth boxes.
+The bundled `mmrotate` is self-contained (no separate `pip install mmrotate` needed). In
+`PlacePriorBase/` the only change vs. upstream is a small fix in
+`mmrotate/evaluation/functional/mean_ap.py` for evaluating images without ground-truth boxes;
+`PlacePrior+P2R2/` additionally adds the three place-prior losses and their training-time
+pseudo-box plumbing (see its README).
 
 ## Getting Started
 
-Training and testing instructions (single-GPU / multi-GPU commands, config list and outputs) are
-provided in [`configs/README.md`](configs/README.md).
+Each variant keeps its own instructions and config list:
+
+- [`PlacePriorBase/configs/README.md`](PlacePriorBase/configs/README.md) -- baseline configs and commands
+- [`PlacePrior+P2R2/configs/README.md`](PlacePrior+P2R2/configs/README.md) -- PlacePrior + Point2RBox-v2 configs and commands
+
+All commands in this README are run from the variant directory you are using
+(`PlacePriorBase/` or `PlacePrior+P2R2/`).
 
 ## Data Preparation
 

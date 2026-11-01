@@ -72,7 +72,7 @@ The three place-prior losses are controlled by `use_size_loss`, `use_angle_loss`
 `use_ourwater_loss` in `bbox_head`; their effective weight is `loss_weight * scale_factor`.
 
 All three default to `False`, so the head behaves exactly like the original Point2RBox-v2 head
-unless a config turns them on. The released DOTA-v1.0 config turns all three on.
+unless a config turns them on. Both released DOTA configs (v1.0 and v1.5) turn all three on.
 
 ## Results
 
